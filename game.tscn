@@ -1,0 +1,76 @@
+[gd_scene load_steps=12 format=4 uid="uid://dmotiavleguaa"]
+
+[ext_resource type="Texture2D" uid="uid://l82oac181f62" path="res://Sprite/Tile sets/Basic Tileset.png" id="1_e2o6t"]
+[ext_resource type="Texture2D" uid="uid://ddkkuh8233mvp" path="res://Sprite/Tile sets/Cube Highlight.png" id="2_feb5d"]
+[ext_resource type="Script" uid="uid://t76h17xb7cy8" path="res://highlight.gd" id="3_fc0e3"]
+[ext_resource type="PackedScene" uid="uid://l8evvbb8uokw" path="res://Player.tscn" id="3_feb5d"]
+[ext_resource type="Texture2D" uid="uid://cj3ibbqnfm1dd" path="res://Sprite/Tile sets/Cube Highlight Red.png" id="3_ryrav"]
+[ext_resource type="Script" uid="uid://chbyp4083bhys" path="res://player.gd" id="5_7jktm"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fc0e3"]
+texture = ExtResource("1_e2o6t")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -8, -16, 0, 0, 8, 16, 0)
+1:0/0 = 0
+1:0/0/texture_origin = Vector2i(0, -8)
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -8, -16, 0, 0, 8, 16, 0)
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, -8)
+2:0/0/z_index = 1
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -8, -16, 0, 0, 8, 16, 0)
+3:0/0 = 0
+3:0/0/texture_origin = Vector2i(0, -8)
+3:0/0/z_index = 1
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -8, -16, 0, 0, 8, 16, 0)
+
+[sub_resource type="TileSet" id="TileSet_7jktm"]
+tile_shape = 1
+tile_size = Vector2i(32, 16)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_fc0e3")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ryrav"]
+texture = ExtResource("2_feb5d")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+0:0/0/z_index = 2
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -8, -16, 0, 0, 8, 16, 0)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eow3j"]
+texture = ExtResource("3_ryrav")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+0:0/0/z_index = 2
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -8, -16, 0, 0, 8, 16, 0)
+
+[sub_resource type="TileSet" id="TileSet_eow3j"]
+tile_shape = 1
+tile_size = Vector2i(32, 16)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_ryrav")
+sources/1 = SubResource("TileSetAtlasSource_eow3j")
+
+[node name="GAME" type="Node2D"]
+
+[node name="Tile" type="TileMapLayer" parent="."]
+y_sort_enabled = true
+texture_filter = 1
+tile_map_data = PackedByteArray("AAD///3/AAABAAAAAAD///7/AAABAAAAAAD+////AAABAAAAAAD//wAAAAABAAAAAAD//wEAAAABAAAAAAD/////AAABAAAAAAAAAP7/AAABAAAAAAAAAP//AAABAAAAAAAAAAAAAAABAAAAAAD+/wAAAAABAAAAAAD+/wEAAAABAAAAAAD//wIAAAABAAAAAAD//wMAAAABAAAAAAAAAAIAAAABAAAAAAAAAAEAAAABAAAAAAABAAAAAAABAAAAAAABAP7/AAABAAAAAAAAAP3/AAABAAAAAAAAAPz/AAABAAAAAAD///v/AAABAAAAAAD///z/AAABAAAAAAD+//v/AAABAAAAAAD+//3/AAABAAAAAAD+//7/AAABAAAAAAD9////AAABAAAAAAABAP//AAABAAAAAAD+//r/AAAAAAAAAAD9//v/AAAAAAAAAAD+//z/AAABAAAAAAD9//3/AAABAAAAAAD9//7/AAABAAAAAAD9/wAAAAABAAAAAAD9/wEAAAABAAAAAAD+/wIAAAABAAAAAAD+/wMAAAABAAAAAAD//wQAAAABAAAAAAAAAAQAAAABAAAAAAAAAAMAAAABAAAAAAABAAIAAAABAAAAAAABAAEAAAABAAAAAAACAP7/AAABAAAAAAABAP3/AAABAAAAAAABAPz/AAABAAAAAAAAAPv/AAABAAAAAAAAAPr/AAABAAAAAAD///n/AAABAAAAAAD///r/AAABAAAAAAD+//n/AAAAAAAAAAD///j/AAAAAAAAAAD9//z/AAAAAAAAAAD8////AAABAAAAAAD8//3/AAAAAAAAAAD8//7/AAAAAAAAAAD9/wIAAAAAAAAAAAD9/wMAAAAAAAAAAAD+/wQAAAAAAAAAAAD+/wUAAAAAAAAAAAD//wYAAAAAAAAAAAD//wUAAAABAAAAAAACAAAAAAABAAAAAAACAP//AAABAAAAAAD//wcAAAAAAAAAAAD8/wEAAAAAAAAAAAD8/wAAAAAAAAAAAAD7////AAAAAAAAAAD9//r/AAAAAAAAAAD9//n/AAAAAAAAAAD+//j/AAAAAAAAAAD+//f/AAAAAAAAAAD///b/AAAAAAAAAAAAAPb/AAAAAAAAAAD///f/AAAAAAAAAAAAAPj/AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_7jktm")
+
+[node name="Highlight" type="TileMapLayer" parent="."]
+y_sort_enabled = true
+texture_filter = 1
+tile_set = SubResource("TileSet_eow3j")
+script = ExtResource("3_fc0e3")
+
+[node name="Player" parent="." instance=ExtResource("3_feb5d")]
+position = Vector2(0, -8)
+script = ExtResource("5_7jktm")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+zoom = Vector2(4, 4)
