@@ -1,0 +1,128 @@
+[gd_scene load_steps=19 format=3 uid="uid://dy1ejioxbj6po"]
+
+[ext_resource type="Texture2D" uid="uid://bghgpqv4s7ysj" path="res://Sprite/Particle/Particle Effect 1-Sheet.png" id="1_7i1q3"]
+[ext_resource type="Texture2D" uid="uid://bjk8fu6fb8p4o" path="res://Sprite/Particle/Ted Attack PArticle-Sheet.png" id="2_1pdhj"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1pdhj"]
+atlas = ExtResource("1_7i1q3")
+region = Rect2(0, 0, 15, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y82fg"]
+atlas = ExtResource("1_7i1q3")
+region = Rect2(15, 0, 15, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ebd1l"]
+atlas = ExtResource("1_7i1q3")
+region = Rect2(30, 0, 15, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xrkct"]
+atlas = ExtResource("1_7i1q3")
+region = Rect2(45, 0, 15, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vuhl4"]
+atlas = ExtResource("1_7i1q3")
+region = Rect2(60, 0, 15, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ipp32"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o0yg1"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qjoak"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1mcsc"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gd4sm"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xarlr"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(80, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h0v5h"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(96, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rburc"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(112, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wl5pb"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(128, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3v6t8"]
+atlas = ExtResource("2_1pdhj")
+region = Rect2(144, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ipp32"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1pdhj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y82fg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ebd1l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xrkct")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vuhl4")
+}],
+"loop": true,
+"name": &"Particle 1",
+"speed": 15.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ipp32")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o0yg1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qjoak")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1mcsc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gd4sm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xarlr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h0v5h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rburc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wl5pb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3v6t8")
+}],
+"loop": true,
+"name": &"Ted Attack Particle",
+"speed": 10.0
+}]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D"]
+z_index = 10
+sprite_frames = SubResource("SpriteFrames_ipp32")
+animation = &"Ted Attack Particle"
+frame_progress = 0.7892852

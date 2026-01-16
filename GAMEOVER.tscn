@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://s74fk6pfk8sj"]
+
+[ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="1_x8v0d"]
+
+[node name="GameOVER" type="CanvasLayer" groups=["game_over"]]
+layer = 100
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -350.0
+offset_top = 370.0
+offset_right = 298.0
+offset_bottom = 570.0
+grow_horizontal = 2
+scale = Vector2(1.08, 1)
+theme_override_fonts/font = ExtResource("1_x8v0d")
+theme_override_font_sizes/font_size = 144
+text = "GameOver"
+horizontal_alignment = 1
+vertical_alignment = 1

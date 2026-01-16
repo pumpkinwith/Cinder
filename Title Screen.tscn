@@ -1,0 +1,166 @@
+[gd_scene load_steps=24 format=3 uid="uid://c3kv21ep70xtm"]
+
+[ext_resource type="Script" uid="uid://buj33obl0whml" path="res://title_screen.gd" id="1_0ijhy"]
+[ext_resource type="Texture2D" uid="uid://824xpmeyjnr7" path="res://Sprite/HUD/Title Screen-Sheet.png" id="1_rpgwi"]
+[ext_resource type="Texture2D" uid="uid://bfhqrokkp8c8t" path="res://Sprite/HUD/Title.png" id="2_6xtyh"]
+[ext_resource type="Texture2D" uid="uid://btxfg7ajqbrqg" path="res://Sprite/HUD/Start button Animation-Sheet.png" id="3_1v7g7"]
+[ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="3_cm0df"]
+[ext_resource type="Texture2D" uid="uid://cqpnp82xa5n07" path="res://Sprite/HUD/Start button Animation Close-Sheet.png" id="3_wrhfn"]
+[ext_resource type="Script" uid="uid://dpukajhdc637" path="res://start.gd" id="4_6326y"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_24db4"]
+font = ExtResource("3_cm0df")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ec58t"]
+atlas = ExtResource("3_wrhfn")
+region = Rect2(0, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_haxwa"]
+atlas = ExtResource("3_wrhfn")
+region = Rect2(70, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lu4jc"]
+atlas = ExtResource("3_wrhfn")
+region = Rect2(140, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s57qb"]
+atlas = ExtResource("3_wrhfn")
+region = Rect2(210, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6326y"]
+atlas = ExtResource("3_1v7g7")
+region = Rect2(0, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wrhfn"]
+atlas = ExtResource("3_1v7g7")
+region = Rect2(70, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cm0df"]
+atlas = ExtResource("3_1v7g7")
+region = Rect2(140, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_24db4"]
+atlas = ExtResource("3_1v7g7")
+region = Rect2(210, 0, 70, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tcsgg"]
+atlas = ExtResource("3_1v7g7")
+region = Rect2(0, 0, 70, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ec58t"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ec58t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_haxwa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lu4jc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s57qb")
+}],
+"loop": true,
+"name": &"Start Closing",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6326y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wrhfn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cm0df")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_24db4")
+}],
+"loop": true,
+"name": &"Start Opening",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tcsgg")
+}],
+"loop": true,
+"name": &"Start_Freezed",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rpgwi"]
+atlas = ExtResource("1_rpgwi")
+region = Rect2(0, 0, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ijhy"]
+atlas = ExtResource("1_rpgwi")
+region = Rect2(128, 0, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6xtyh"]
+atlas = ExtResource("1_rpgwi")
+region = Rect2(256, 0, 128, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1v7g7"]
+atlas = ExtResource("1_rpgwi")
+region = Rect2(384, 0, 128, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6326y"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rpgwi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ijhy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6xtyh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1v7g7")
+}],
+"loop": true,
+"name": &"Title",
+"speed": 5.0
+}]
+
+[node name="Title Screen" type="Node2D"]
+script = ExtResource("1_0ijhy")
+
+[node name="Title" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(-0.99999994, -16)
+scale = Vector2(0.42307657, 0.42307657)
+texture = ExtResource("2_6xtyh")
+
+[node name="QuitLabel" type="Label" parent="."]
+z_index = 10
+offset_left = -40.0
+offset_top = 4.0
+offset_right = 34.0
+offset_bottom = 19.0
+scale = Vector2(0.1964817, 0.1964817)
+text = "Quit Game"
+label_settings = SubResource("LabelSettings_24db4")
+
+[node name="Start" type="AnimatedSprite2D" parent="."]
+z_index = 1
+position = Vector2(-26, -2)
+scale = Vector2(0.40624994, 0.40625)
+sprite_frames = SubResource("SpriteFrames_ec58t")
+animation = &"Start Opening"
+autoplay = "Start_Freezed"
+script = ExtResource("4_6326y")
+
+[node name="BG" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.671875, 0.671875)
+sprite_frames = SubResource("SpriteFrames_6326y")
+animation = &"Title"
+autoplay = "Title"
+
+[node name="Camera2D" type="Camera2D" parent="BG"]
+zoom = Vector2(35, 35)

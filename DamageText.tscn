@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://bu1jy8f0w3lxa"]
+
+[ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="1_damage"]
+[ext_resource type="Script" uid="uid://cuduvh1ekrakc" path="res://damage_text.gd" id="2_damage"]
+
+[node name="DamageText" type="Node2D"]
+script = ExtResource("2_damage")
+
+[node name="Label" type="Label" parent="."]
+z_index = 10
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = -10.0
+theme_override_fonts/font = ExtResource("1_damage")
+theme_override_font_sizes/font_size = 16
+text = "10"
+horizontal_alignment = 1
+vertical_alignment = 1

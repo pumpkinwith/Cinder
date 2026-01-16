@@ -1,0 +1,400 @@
+extends CharacterBody2D
+
+const tile_size: Vector2 = Vector2(8, 4)
+@export var move_speed: float = 30.0
+@export var move_delay: float = 0.0
+@export var detection_range: float = 100.0
+@export var health: int = 2
+@export var max_health: int = 2
+@export var respawn_enabled: bool = true
+
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D if has_node("AnimatedSprite2D") else null
+@onready var hitbox: Area2D = $"Hit Box" if has_node("Hit Box") else null
+@onready var attack_area: Area2D = $Attack if has_node("Attack") else null
+
+var is_moving: bool = false
+var target_pos: Vector2
+var player: CharacterBody2D
+var move_timer: float = 0.0
+var current_direction: String = "SE"
+var attack_cooldown: float = 0.0
+var can_attack: bool = true
+var stuck_timer: float = 0.0
+var last_position: Vector2
+var is_knockback: bool = false
+var knockback_velocity: Vector2 = Vector2.ZERO
+var failed_moves: int = 0
+
+const STUCK_TIME: float = 3.0
+const KNOCKBACK_FRICTION: float = 400.0
+const MAX_FAILED_MOVES: int = 3
+
+func _ready() -> void:
+	add_to_group("enemy")
+	target_pos = global_position
+	last_position = global_position
+	# Find the player node
+	player = get_tree().get_first_node_in_group("player")
+	
+	# Connect hitbox signal
+	if hitbox:
+		hitbox.body_entered.connect(_on_hitbox_body_entered)
+	
+	# Play initial idle animation
+	if sprite:
+		sprite.play("Idle_" + current_direction)
+
+func _physics_process(delta: float) -> void:
+	if not player:
+		return
+	
+	# Handle knockback
+	if is_knockback:
+		velocity = knockback_velocity
+		move_and_slide()
+		
+		# Apply friction to knockback
+		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, KNOCKBACK_FRICTION * delta)
+		
+		# End knockback when velocity is very small
+		if knockback_velocity.length() < 1.0:
+			is_knockback = false
+			knockback_velocity = Vector2.ZERO
+			velocity = Vector2.ZERO
+			target_pos = global_position
+		return
+	
+	# Handle attack cooldown
+	if not can_attack:
+		attack_cooldown -= delta
+		if attack_cooldown <= 0:
+			can_attack = true
+	
+	# If moving, interpolate smoothly to target
+	if is_moving:
+		var direction = (target_pos - global_position).normalized()
+		velocity = direction * move_speed
+		move_and_slide()
+		
+		# If we hit something, stop moving
+		if get_slide_collision_count() > 0:
+			velocity = Vector2.ZERO
+			is_moving = false
+			target_pos = global_position
+			move_timer = move_delay
+		elif global_position.distance_to(target_pos) < 0.5:
+			global_position = target_pos
+			velocity = Vector2.ZERO
+			is_moving = false
+			move_timer = move_delay
+		return
+	
+	# Wait before next move
+	if move_timer > 0:
+		move_timer -= delta
+		return
+	
+	# Calculate direction to player
+	var direction_to_player = player.global_position - global_position
+	var distance_to_player = global_position.distance_to(player.global_position)
+	
+	# Don't move if player is out of range
+	if distance_to_player > detection_range:
+		return
+	
+	# Stop moving if we're adjacent to the player (within half a tile)
+	if distance_to_player < 5:
+		return
+	
+	# Check line of sight to player using raycast
+	var space_state = get_world_2d().direct_space_state
+	var ray_query = PhysicsRayQueryParameters2D.create(global_position, player.global_position)
+	ray_query.collision_mask = collision_mask
+	ray_query.collide_with_areas = false
+	ray_query.collide_with_bodies = true
+	ray_query.exclude = [self]
+	
+	var ray_result = space_state.intersect_ray(ray_query)
+	
+	# If raycast hit something before reaching player, can't see them
+	if ray_result and ray_result.collider != player:
+		return
+	
+	# Update enemy facing direction to face the player
+	if sprite:
+		var face_direction = ""
+		if direction_to_player.x > 0 and direction_to_player.y > 0:
+			face_direction = "SE"
+		elif direction_to_player.x < 0 and direction_to_player.y < 0:
+			face_direction = "NW"
+		elif direction_to_player.x < 0 and direction_to_player.y > 0:
+			face_direction = "SW"
+		else:
+			face_direction = "NE"
+		
+		if face_direction != current_direction:
+			current_direction = face_direction
+			sprite.play("Idle_" + current_direction)
+	
+	# Determine the best direction based on player position
+	var move_offset: Vector2 = Vector2.ZERO
+	
+	# Choose the diagonal direction that gets closest to player
+	if direction_to_player.x > 0 and direction_to_player.y > 0:
+		move_offset = Vector2(tile_size.x, tile_size.y)  # SE
+	elif direction_to_player.x < 0 and direction_to_player.y < 0:
+		move_offset = Vector2(-tile_size.x, -tile_size.y)  # NW
+	elif direction_to_player.x < 0 and direction_to_player.y > 0:
+		move_offset = Vector2(-tile_size.x, tile_size.y)  # SW
+	else:  # x > 0 and y < 0
+		move_offset = Vector2(tile_size.x, -tile_size.y)  # NE
+	
+	# Try primary direction first
+	var test_pos = global_position + move_offset
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = test_pos
+	query.collision_mask = collision_mask
+	query.collide_with_areas = false
+	var result = space_state.intersect_point(query, 1)
+	if result.is_empty():
+		# Check if tile is occupied by player or other enemies
+		var tile_occupied = false
+		
+		# Check player position
+		if player.global_position.distance_to(test_pos) < 2:
+			tile_occupied = true
+		
+		# Check other enemies
+		if not tile_occupied:
+			for other_enemy in get_tree().get_nodes_in_group("enemy"):
+				if other_enemy != self and other_enemy.global_position.distance_to(test_pos) < 2:
+					tile_occupied = true
+					break
+		
+		if not tile_occupied:
+			target_pos = test_pos
+			is_moving = true
+			failed_moves = 0  # Reset counter on successful move
+		return
+	
+	# If primary direction blocked, increment failed move counter
+	failed_moves += 1
+	
+	# If stuck too many times, try perpendicular directions first
+	if failed_moves >= MAX_FAILED_MOVES:
+	var alternate_moves = []
+	if abs(direction_to_player.x) > abs(direction_to_player.y):
+		# Prefer horizontal movement
+		if direction_to_player.x > 0:
+			alternate_moves = [
+				Vector2(tile_size.x, -tile_size.y),  # NE
+				Vector2(tile_size.x, tile_size.y),   # SE
+				Vector2(-tile_size.x, -tile_size.y), # NW
+				Vector2(-tile_size.x, tile_size.y)   # SW
+			]
+		else:
+			alternate_moves = [
+				Vector2(-tile_size.x, tile_size.y),  # SW
+				Vector2(-tile_size.x, -tile_size.y), # NW
+				Vector2(tile_size.x, tile_size.y),   # SE
+				Vector2(tile_size.x, -tile_size.y)   # NE
+			]
+	else:
+		# Prefer vertical movement
+		if direction_to_player.y > 0:
+			alternate_moves = [
+				Vector2(tile_size.x, tile_size.y),   # SE
+				Vector2(-tile_size.x, tile_size.y),  # SW
+				Vector2(tile_size.x, -tile_size.y),  # NE
+				Vector2(-tile_size.x, -tile_size.y)  # NW
+			]
+		else:
+			alternate_moves = [
+				Vector2(-tile_size.x, -tile_size.y), # NW
+				Vector2(tile_size.x, -tile_size.y),  # NE
+				Vector2(-tile_size.x, tile_size.y),  # SW
+				Vector2(tile_size.x, tile_size.y)    # SE
+			]
+	
+	# Try each alternate direction
+	for alt_move in alternate_moves:
+		var alt_test_pos = global_position + alt_move
+		query.position = alt_test_pos
+		result = space_state.intersect_point(query, 1)
+		
+		if result.is_empty():
+			# Check if tile is occupied by player or other enemies
+			var tile_occupied = false
+			
+			# Check player position
+			if player.global_position.distance_to(alt_test_pos) < 2:
+				tile_occupied = true
+			
+			# Check other enemies
+			if not tile_occupied:
+				for other_enemy in get_tree().get_nodes_in_group("enemy"):
+					if other_enemy != self and other_enemy.global_position.distance_to(alt_test_pos) < 2:
+						tile_occupied = true
+						break
+			
+			if not tile_occupied:
+				target_pos = alt_test_pos
+				is_moving = true
+				failed_moves = 0
+				return
+
+	# Track stuck time; if not moving enough for several seconds, reset pathfinding
+	var moved_distance = global_position.distance_to(last_position)
+	if moved_distance < 0.5:
+		stuck_timer += delta
+		if stuck_timer >= STUCK_TIME:
+			failed_moves = MAX_FAILED_MOVES  # Force perpendicular path search
+			stuck_timer = 0.0  # Reset timer to try again
+	else:
+		stuck_timer = 0.0
+		if moved_distance > 1.0:  # Successfully moving
+			failed_moves = max(0, failed_moves - 1)  # Gradually reduce failed counter
+	last_position = global_position
+
+func _unstuck_to_player() -> void:
+	if not player:
+		return
+	var space_state = get_world_2d().direct_space_state
+	var candidate_offsets = [
+		Vector2(tile_size.x, tile_size.y),
+		Vector2(-tile_size.x, -tile_size.y),
+		Vector2(-tile_size.x, tile_size.y),
+		Vector2(tile_size.x, -tile_size.y),
+		Vector2.ZERO
+	]
+	var query = PhysicsPointQueryParameters2D.new()
+	query.collide_with_areas = false
+	query.collision_mask = collision_mask
+	for offset in candidate_offsets:
+		var test_pos = player.global_position + offset
+		query.position = test_pos
+		var result = space_state.intersect_point(query, 1)
+		var tile_free = result.is_empty()
+		
+		# Check if occupied by other enemies
+		var tile_occupied = false
+		for other_enemy in get_tree().get_nodes_in_group("enemy"):
+			if other_enemy != self and other_enemy.global_position.distance_to(test_pos) < 2:
+				tile_occupied = true
+				break
+	# Apply knockback with smooth physics
+	if knockback_direction != Vector2.ZERO:
+		is_knockback = true
+		is_moving = false
+		knockback_velocity = knockback_direction.normalized() * 250.0  # Knockback speed for ~1.25 tiles
+		velocity = Vector2.ZERO
+	
+	if health <= 0:ck
+	if knockback_direction != Vector2.ZERO:
+		var knockback_offset = knockback_direction * 4.0  # 0.5 tile = 4 pixels (tile_size is 8x4)
+		var knockback_pos = global_position + knockback_offset
+		
+		# Check if knockback position is valid (no collision)
+		var space_state = get_world_2d().direct_space_state
+		var query = PhysicsPointQueryParameters2D.new()
+		query.position = knockback_pos
+		query.collision_mask = collision_mask
+		query.collide_with_areas = false
+		var result = space_state.intersect_point(query, 1)
+		
+		if result.is_empty():
+			global_position = knockback_pos
+			target_pos = knockback_pos
+	
+	if health <= 0:
+		if respawn_enabled:
+			_respawn()
+		else:
+			queue_free()
+
+func _on_hitbox_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player") and can_attack:
+		if not attack_area:
+			return
+		
+		# Check if player is in attack area
+		var bodies_in_range = attack_area.get_overlapping_bodies()
+		var player_in_range = false
+		for check_body in bodies_in_range:
+			if check_body == body:
+				player_in_range = true
+				break
+		
+		if player_in_range and body.has_method("take_damage"):
+			body.take_damage()
+			can_attack = false
+			attack_cooldown = 3.0
+
+func _respawn() -> void:
+	# Reset health and state
+	health = max_health
+	velocity = Vector2.ZERO
+	is_moving = false
+	can_attack = true
+	attack_cooldown = 0.0
+	stuck_timer = 0.0
+	is_knockback = false
+	knockback_velocity = Vector2.ZERO
+	
+	if not player:
+		return
+	
+	# Find valid position near player
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsPointQueryParameters2D.new()
+	query.collision_mask = collision_mask
+	query.collide_with_areas = false
+	
+	# Try positions around the player in expanding circles
+	var candidate_offsets = [
+		Vector2(tile_size.x * 3, tile_size.y * 3),   # SE far
+	stuck_timer = 0.0
+	is_knockback = false
+	knockback_velocity = Vector2.ZERO
+	failed_moves = 0ize.y * 3),  # NE far
+		Vector2(tile_size.x * 2, tile_size.y * 2),   # SE
+		Vector2(-tile_size.x * 2, -tile_size.y * 2), # NW
+		Vector2(-tile_size.x * 2, tile_size.y * 2),  # SW
+		Vector2(tile_size.x * 2, -tile_size.y * 2),  # NE
+		Vector2(tile_size.x * 4, 0),                  # Right
+		Vector2(-tile_size.x * 4, 0),                 # Left
+		Vector2(0, tile_size.y * 4),                  # Down
+		Vector2(0, -tile_size.y * 4)                  # Up
+	]
+	
+	for offset in candidate_offsets:
+		var test_pos = player.global_position + offset
+		query.position = test_pos
+		var result = space_state.intersect_point(query, 1)
+		
+		if result.is_empty():
+			# Check if occupied by player or other enemies
+			var occupied = false
+			
+			if player.global_position.distance_to(test_pos) < tile_size.x:
+				occupied = true
+			
+			if not occupied:
+				for other_enemy in get_tree().get_nodes_in_group("enemy"):
+					if other_enemy != self and other_enemy.global_position.distance_to(test_pos) < 2:
+						occupied = true
+						break
+			
+			if not occupied:
+				global_position = test_pos
+				target_pos = test_pos
+				last_position = test_pos
+				print("Enemy respawned at: ", test_pos)
+				return
+	
+	# Fallback: respawn 3 tiles away
+	var fallback_pos = player.global_position + Vector2(tile_size.x * 3, tile_size.y * 3)
+	global_position = fallback_pos
+	target_pos = fallback_pos
+	last_position = fallback_pos
+	print("Enemy respawned at fallback position: ", fallback_pos)
