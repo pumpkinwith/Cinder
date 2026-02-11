@@ -1,233 +1,174 @@
-extends Node2D
+extends Control
+
+## Title screen with animated reveal sequence
+## Background → Title (fire) → Start Button (fire) → Quit Label
+
+# Timing constants
+const BG_DELAY: float = 0.5
+const BG_FADE_DURATION: float = 1.5
+const TITLE_DELAY: float = 1.0
+const TITLE_REVEAL_DURATION: float = 2.5
+const BUTTON_DELAY: float = 0.5
+const BUTTON_REVEAL_DURATION: float = 0.8
+const QUIT_FADE_DURATION: float = 0.5
+const BURNOUT_BUTTON_DURATION: float = 0.5
+const BURNOUT_TITLE_DURATION: float = 0.7
+const BURNOUT_BG_DURATION: float = 0.5
+
+# Fire shader constants
+const NOISE_SCALE: float = 1.5
+const DISSOLVE_BORDER_SIZE: float = 0.3
+const DISSOLVE_COLOR_STRENGTH: float = 1.5
+const DISSOLVE_COLOR_FROM: Color = Color(1.0, 0.9, 0.4, 1.0)
+const DISSOLVE_COLOR_TO: Color = Color(1.0, 0.4, 0.1, 1.0)
 
 @onready var camera: Camera2D = $Camera2D if has_node("Camera2D") else null
 @onready var background_sprite: AnimatedSprite2D = get_node_or_null("BG")
 @onready var title_sprite: Node = get_node_or_null("Title")
 @onready var start_button: Node = get_node_or_null("Start")
-@onready var quit_label: Label = get_node_or_null("QuitLabel")
+@onready var bgm: AudioStreamPlayer = get_node_or_null("Main BGM demo")
 
-const BG_FADE_DURATION = 1.5
-const TITLE_FADE_DURATION = 2.5
-const BUTTON_FADE_DURATION = 1.5
-const BG_DELAY = 0.5
-const TITLE_DELAY = 1.0
-const BUTTON_DELAY = 0.5
-
-var interaction_enabled: bool = false
+var fade_overlay: ColorRect  # Created programmatically
 
 func _ready() -> void:
-	# Create black background layer that fills everything
-	var black_bg = ColorRect.new()
-	black_bg.name = "BlackBackground"
-	black_bg.color = Color.BLACK
-	black_bg.z_index = -1000
-	black_bg.position = Vector2(-50000, -50000)
-	black_bg.size = Vector2(100000, 100000)
-	add_child(black_bg)
-	
 	# Setup camera
 	if camera:
 		camera.enabled = true
-		camera.position = Vector2.ZERO
-		camera.zoom = Vector2.ONE
+		camera.make_current()
 	
-	# Play background animation if exists
+	# Initialize background (already visible)
 	if background_sprite:
-		background_sprite.modulate.a = 0  # Start invisible
+		background_sprite.modulate.a = 1.0
 		if background_sprite.sprite_frames:
 			background_sprite.play()
 	
-	# Hide title and button initially
-	if title_sprite:
-		title_sprite.modulate.a = 0  # Start invisible
-	if start_button:
-		start_button.modulate.a = 0
-	
-	# Hide quit label initially
-	if quit_label:
-		quit_label.modulate.a = 0.0
-	
-	# Create fade overlay
-	var fade_overlay = ColorRect.new()
-	fade_overlay.name = "FadeOverlay"
+	# Create fade overlay covering entire viewport (matching BG2 ColorRect size)
+	fade_overlay = ColorRect.new()
 	fade_overlay.color = Color.BLACK
-	fade_overlay.z_index = 1000
-	fade_overlay.position = Vector2(-50000, -50000)
-	fade_overlay.size = Vector2(100000, 100000)
+	fade_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fade_overlay.z_index = 100
+	
+	# Match the BG2 ColorRect dimensions from the scene
+	fade_overlay.position = Vector2(-5462.0, -6250.0)
+	fade_overlay.size = Vector2(9111.0 - (-5462.0), 8323.0 - (-6250.0))
+	
 	add_child(fade_overlay)
 	
-	# Start reveal sequence
-	_start_reveal_sequence(fade_overlay)
-
-func _start_reveal_sequence(fade_overlay: ColorRect) -> void:
-	# Wait initial delay
-	await get_tree().create_timer(BG_DELAY).timeout
-	
-	# Remove black overlay
-	fade_overlay.queue_free()
-	
-	# Fade in background
-	if background_sprite:
-		var tween = create_tween()
-		tween.tween_property(background_sprite, "modulate:a", 1.0, BG_FADE_DURATION)
-		await tween.finished
-	
-	# Wait before showing title
-	await get_tree().create_timer(TITLE_DELAY).timeout
-	
-	# Apply fire reveal shader to title
+	# Initialize title and button (start invisible)
 	if title_sprite:
-		# Make visible first
-		title_sprite.modulate.a = 1.0
-		
-		var shader_material = ShaderMaterial.new()
-		shader_material.shader = load("res://Shaders/pixel-art-shaders/shaders/dissolve.gdshader")
-		shader_material.set_shader_parameter("noise_texture", load("res://Shaders/pixel-art-shaders/burn-noise.tres"))
-		shader_material.set_shader_parameter("noise_scale", 1.5)
-		shader_material.set_shader_parameter("palette_shift", false)
-		shader_material.set_shader_parameter("use_dissolve_color", true)
-		shader_material.set_shader_parameter("dissolve_color_from", Color(1.0, 0.9, 0.4, 1.0))  # Bright yellow
-		shader_material.set_shader_parameter("dissolve_color_to", Color(1.0, 0.4, 0.1, 1.0))  # Orange
-		shader_material.set_shader_parameter("dissolve_color_strength", 1.5)
-		shader_material.set_shader_parameter("dissolve_border_size", 0.3)
-		shader_material.set_shader_parameter("pixelization", 0)
-		shader_material.set_shader_parameter("time", 1.0)  # Start hidden
-		
-		title_sprite.material = shader_material
-		
-		# Animate fire reveal (reverse from 1.0 to 0.0)
-		var tween = create_tween()
-		tween.tween_method(func(value): 
-			shader_material.set_shader_parameter("time", value)
-		, 1.0, 0.0, TITLE_FADE_DURATION)
-		await tween.finished
-	
-	# Wait before showing button
-	await get_tree().create_timer(BUTTON_DELAY).timeout
-	
-	# Finally reveal start button with dissolve effect (faster)
+		title_sprite.modulate.a = 0.0
 	if start_button:
-		var button_shader = ShaderMaterial.new()
-		button_shader.shader = load("res://Shaders/pixel-art-shaders/shaders/dissolve.gdshader")
-		button_shader.set_shader_parameter("noise_texture", load("res://Shaders/pixel-art-shaders/burn-noise.tres"))
-		button_shader.set_shader_parameter("noise_scale", 1.5)
-		button_shader.set_shader_parameter("palette_shift", false)
-		button_shader.set_shader_parameter("use_dissolve_color", true)
-		button_shader.set_shader_parameter("dissolve_color_from", Color(1.0, 0.9, 0.4, 1.0))
-		button_shader.set_shader_parameter("dissolve_color_to", Color(1.0, 0.4, 0.1, 1.0))
-		button_shader.set_shader_parameter("dissolve_color_strength", 1.5)
-		button_shader.set_shader_parameter("dissolve_border_size", 0.3)
-		button_shader.set_shader_parameter("pixelization", 0)
-		button_shader.set_shader_parameter("time", 1.0)  # Start hidden
-		
-		start_button.material = button_shader
-		start_button.modulate.a = 1.0
-		
-		# Animate quickly (0.8 seconds)
-		var tween = create_tween()
-		tween.tween_method(func(value): 
-			button_shader.set_shader_parameter("time", value)
-		, 1.0, 0.0, 0.8)
-		await tween.finished
-		
-		# Remove shader after reveal
-		start_button.material = null
-	
-	# Show quit label with fade
-	if quit_label:
-		var quit_tween = create_tween()
-		quit_tween.tween_property(quit_label, "modulate:a", 1.0, 0.5)
-		await quit_tween.finished
-	
-	# Enable interactions after all animations complete
-	interaction_enabled = true
-	
-	# Enable start button interaction
-	if start_button:
-		start_button.interaction_enabled = true
-
-func _process(_delta: float) -> void:
-	# Keep background animation playing
-	if background_sprite and not background_sprite.is_playing():
-		background_sprite.play()
-	
-	# Handle quit label hover and click (area = label size only)
-	if interaction_enabled and quit_label and quit_label.modulate.a > 0.5:
-		var label_rect = quit_label.get_rect()
-		var mouse_pos = quit_label.get_local_mouse_position()
-		if label_rect.has_point(mouse_pos):
-			quit_label.modulate = Color(1.0, 0.7, 0.3, 1.0)  # Orange hover
-		else:
-			quit_label.modulate = Color(1.0, 1.0, 1.0, 1.0)
-
-func _input(event: InputEvent) -> void:
-	if not interaction_enabled:
-		return
-	
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if quit_label and quit_label.modulate.a > 0.5:
-			var label_rect = quit_label.get_rect()
-			var mouse_pos = quit_label.get_local_mouse_position()
-			if label_rect.has_point(mouse_pos):
-				get_tree().quit()
-
-func _on_start_pressed():
-	await _start_burnout_transition()
-	get_tree().change_scene_to_file("res://Tutorial Land.tscn")
-
-func _start_burnout_transition() -> void:
-	# Burn out start button first
-	if start_button:
-		var button_shader = ShaderMaterial.new()
-		button_shader.shader = load("res://Shaders/pixel-art-shaders/shaders/dissolve.gdshader")
-		button_shader.set_shader_parameter("noise_texture", load("res://Shaders/pixel-art-shaders/burn-noise.tres"))
-		button_shader.set_shader_parameter("noise_scale", 1.5)
-		button_shader.set_shader_parameter("palette_shift", false)
-		button_shader.set_shader_parameter("use_dissolve_color", true)
-		button_shader.set_shader_parameter("dissolve_color_from", Color(1.0, 0.9, 0.4, 1.0))
-		button_shader.set_shader_parameter("dissolve_color_to", Color(1.0, 0.4, 0.1, 1.0))
-		button_shader.set_shader_parameter("dissolve_color_strength", 1.5)
-		button_shader.set_shader_parameter("dissolve_border_size", 0.3)
-		button_shader.set_shader_parameter("pixelization", 0)
-		button_shader.set_shader_parameter("time", 0.0)
-		start_button.material = button_shader
-		var tween = create_tween()
-		tween.tween_method(func(value):
-			button_shader.set_shader_parameter("time", value)
-		, 0.0, 1.0, 0.5)
-		await tween.finished
 		start_button.modulate.a = 0.0
 	
-	# Burn out quit label next
-	if quit_label:
-		var quit_tween = create_tween()
-		quit_tween.tween_property(quit_label, "modulate:a", 0.0, 0.4)
-		await quit_tween.finished
+	# Begin reveal sequence
+	_reveal_sequence()
+
+func _create_dissolve_shader() -> ShaderMaterial:
+	"""Create configured fire dissolve shader"""
+	var shader := ShaderMaterial.new()
+	shader.shader = load("res://Shaders/pixel-art-shaders/shaders/dissolve.gdshader")
+	shader.set_shader_parameter("noise_texture", load("res://Shaders/pixel-art-shaders/burn-noise.tres"))
+	shader.set_shader_parameter("noise_scale", NOISE_SCALE)
+	shader.set_shader_parameter("palette_shift", false)
+	shader.set_shader_parameter("use_dissolve_color", true)
+	shader.set_shader_parameter("dissolve_color_from", DISSOLVE_COLOR_FROM)
+	shader.set_shader_parameter("dissolve_color_to", DISSOLVE_COLOR_TO)
+	shader.set_shader_parameter("dissolve_color_strength", DISSOLVE_COLOR_STRENGTH)
+	shader.set_shader_parameter("dissolve_border_size", DISSOLVE_BORDER_SIZE)
+	shader.set_shader_parameter("pixelization", 0)
+	return shader
+
+func _fire_reveal(node: Node, duration: float) -> void:
+	"""Reveal a node using fire dissolve effect"""
+	if not node:
+		return
 	
-	# Burn out title last
+	# Make visible and apply shader
+	node.modulate.a = 1.0
+	var shader := _create_dissolve_shader()
+	shader.set_shader_parameter("time", 1.0)  # Start hidden
+	node.material = shader
+	
+	# Animate from hidden (1.0) to visible (0.0)
+	var tween := create_tween()
+	tween.tween_method(
+		func(value: float) -> void:
+			shader.set_shader_parameter("time", value),
+		1.0, 0.0, duration
+	)
+	await tween.finished
+
+func _reveal_sequence() -> void:
+	"""Orchestrate the reveal: BG → Title → Button → Quit"""
+	# Step 1: Wait then fade out black overlay
+	await get_tree().create_timer(BG_DELAY).timeout
+	if fade_overlay:
+		var bg_tween := create_tween()
+		bg_tween.tween_property(fade_overlay, "color", Color(0.0, 0.0, 0.0, 0.0), BG_FADE_DURATION)
+		await bg_tween.finished
+		fade_overlay.visible = false
+	
+	# Step 2: Fire reveal title
+	await get_tree().create_timer(TITLE_DELAY).timeout
 	if title_sprite:
-		var shader_material = ShaderMaterial.new()
-		shader_material.shader = load("res://Shaders/pixel-art-shaders/shaders/dissolve.gdshader")
-		shader_material.set_shader_parameter("noise_texture", load("res://Shaders/pixel-art-shaders/burn-noise.tres"))
-		shader_material.set_shader_parameter("noise_scale", 1.5)
-		shader_material.set_shader_parameter("palette_shift", false)
-		shader_material.set_shader_parameter("use_dissolve_color", true)
-		shader_material.set_shader_parameter("dissolve_color_from", Color(1.0, 0.9, 0.4, 1.0))
-		shader_material.set_shader_parameter("dissolve_color_to", Color(1.0, 0.4, 0.1, 1.0))
-		shader_material.set_shader_parameter("dissolve_color_strength", 1.5)
-		shader_material.set_shader_parameter("dissolve_border_size", 0.3)
-		shader_material.set_shader_parameter("pixelization", 0)
-		shader_material.set_shader_parameter("time", 0.0)
-		title_sprite.material = shader_material
-		var tween = create_tween()
-		tween.tween_method(func(value):
-			shader_material.set_shader_parameter("time", value)
-		, 0.0, 1.0, 0.7)
-		await tween.finished
+		await _fire_reveal(title_sprite, TITLE_REVEAL_DURATION)
+	
+	# Step 3: Fire reveal start button
+	await get_tree().create_timer(BUTTON_DELAY).timeout
+	if start_button:
+		await _fire_reveal(start_button, BUTTON_REVEAL_DURATION)
+		start_button.material = null  # Remove shader after reveal
+		
+		# Enable interaction
+		if "interaction_enabled" in start_button:
+			start_button.interaction_enabled = true
+	
+	# Step 4: Play BGM after all reveals complete
+	if bgm and bgm.has_method("play"):
+		bgm.volume_db = -5.0  # Slightly lower than default
+		bgm.play()
+		print("[TitleScreen] BGM started playing at volume: ", bgm.volume_db)
+	else:
+		print("[TitleScreen] BGM not found or cannot play")
+
+func _fire_burnout(node: Node, duration: float) -> void:
+	"""Burn out a node using fire dissolve effect"""
+	if not node:
+		return
+	
+	var shader := _create_dissolve_shader()
+	shader.set_shader_parameter("time", 0.0)  # Start visible
+	node.material = shader
+	
+	# Animate from visible (0.0) to hidden (1.0)
+	var tween := create_tween()
+	tween.tween_method(
+		func(value: float) -> void:
+			shader.set_shader_parameter("time", value),
+		0.0, 1.0, duration
+	)
+	await tween.finished
+
+func _on_start_pressed() -> void:
+	"""Reverse fire effect to burn out UI before scene change"""
+	# Burn out button
+	if start_button:
+		await _fire_burnout(start_button, BURNOUT_BUTTON_DURATION)
+		start_button.modulate.a = 0.0
+	
+	# Burn out title
+	if title_sprite:
+		await _fire_burnout(title_sprite, BURNOUT_TITLE_DURATION)
 		title_sprite.modulate.a = 0.0
 	
-	# Fade out background
-	if background_sprite:
-		var bg_tween = create_tween()
-		bg_tween.tween_property(background_sprite, "modulate:a", 0.0, 0.5)
-		await bg_tween.finished
+	# Fade to black
+	if fade_overlay:
+		fade_overlay.visible = true
+		fade_overlay.color = Color(0.0, 0.0, 0.0, 0.0)
+		fade_overlay.z_index = 200
+		var fade_tween := get_tree().create_tween()
+		fade_tween.tween_property(fade_overlay, "color", Color.BLACK, BURNOUT_BG_DURATION)
+		await fade_tween.finished
+	
+	# Change to Tutorial Land scene
+	get_tree().change_scene_to_file("res://Tutorial Land.tscn")

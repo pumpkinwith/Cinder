@@ -1,19 +1,14 @@
-[gd_scene load_steps=64 format=3 uid="uid://l8evvbb8uokw"]
+[gd_scene format=3 uid="uid://l8evvbb8uokw"]
 
-[ext_resource type="Texture2D" uid="uid://vros7digfy77" path="res://Sprite/Player/Combat/Attack NE-Sheet.png" id="1_cxr5p"]
+[ext_resource type="Texture2D" uid="uid://beeb1huc42faf" path="res://Sprite/Player/Combat/Attack NE-Sheet.png" id="1_cxr5p"]
+[ext_resource type="Script" uid="uid://dnb7h2ogujvmk" path="res://player.gd" id="1_dtqjt"]
 [ext_resource type="Texture2D" uid="uid://3eo21hnir7wk" path="res://Sprite/Player/Player Sprite Sheet.png" id="1_xhfnw"]
-[ext_resource type="Texture2D" uid="uid://q0h2ypfywk1j" path="res://Sprite/Player/Combat/Attack NW-Sheet.png" id="2_tdg3f"]
+[ext_resource type="Texture2D" uid="uid://dusw7xguerw8j" path="res://Sprite/Player/Combat/Attack NW-Sheet.png" id="2_tdg3f"]
 [ext_resource type="Texture2D" uid="uid://b5ftsgu6fu4b4" path="res://Sprite/Player/Combat/Attack SE-Sheet.png" id="3_dtqjt"]
 [ext_resource type="Texture2D" uid="uid://dtyj1b514e0jw" path="res://Sprite/Player/Combat/Attack SW-Sheet.png" id="4_5ncpa"]
 [ext_resource type="Texture2D" uid="uid://bjgxqcre66y04" path="res://Sprite/Player/Combat/Player Death-Sheet.png" id="5_tdg3f"]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kpjcp"]
-radius = 12.999532
-height = 37.99863
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xhfnw"]
-radius = 4.0
-height = 12.0
+[ext_resource type="Script" uid="uid://c0e7blwpwhku0" path="res://hit_box.gd" id="8_5ncpa"]
+[ext_resource type="Script" uid="uid://b56wi7oejwvlv" path="res://hurt_box.gd" id="8_wi0c6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1jgrc"]
 atlas = ExtResource("1_cxr5p")
@@ -247,7 +242,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"Attack_NE",
-"speed": 15.0
+"speed": 18.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -267,7 +262,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"Attack_NW",
-"speed": 15.0
+"speed": 18.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -287,7 +282,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"Attack_SE",
-"speed": 15.0
+"speed": 18.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -307,7 +302,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"Attack_SW",
-"speed": 15.0
+"speed": 18.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -454,36 +449,61 @@ animations = [{
 "speed": 7.5
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_xhfnw"]
-size = Vector2(4.5, 5.5)
+[sub_resource type="CircleShape2D" id="CircleShape2D_tdg3f"]
+radius = 3.0
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
-collision_layer = 2
+[sub_resource type="Gradient" id="Gradient_tdg3f"]
+offsets = PackedFloat32Array(0.0033333334, 0.6533333)
+colors = PackedColorArray(0.94070715, 0.5652372, 1.1551381e-06, 1, 0, 0, 0, 1)
 
-[node name="Attack" type="Area2D" parent="."]
-collision_layer = 0
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_dtqjt"]
+gradient = SubResource("Gradient_tdg3f")
+fill = 1
+fill_from = Vector2(0.5070093, 0.47196263)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Attack"]
-position = Vector2(0, 5)
-rotation = 1.5792879
-shape = SubResource("CapsuleShape2D_kpjcp")
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tdg3f"]
+radius = 6.0
+height = 14.0
 
-[node name="Hit Box" type="Area2D" parent="."]
-collision_layer = 2
-collision_mask = 0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dtqjt"]
+radius = 10.344841
+height = 25.000025
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hit Box"]
-shape = SubResource("CapsuleShape2D_xhfnw")
+[node name="Player" type="CharacterBody2D" unique_id=1822661211]
+collision_layer = 4
+floor_stop_on_slope = false
+floor_block_on_wall = false
+script = ExtResource("1_dtqjt")
+move_speed = 50.0
+attack_cooldown_time = 0.1
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=731165133]
 z_index = 2
 y_sort_enabled = true
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_5ncpa")
 animation = &"Idle_SW"
 autoplay = "Idle_SW"
-frame_progress = 0.623812
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 4)
-shape = SubResource("RectangleShape2D_xhfnw")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1825736763]
+position = Vector2(0, 3)
+shape = SubResource("CircleShape2D_tdg3f")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=877053060]
+position = Vector2(0, 5)
+color = Color(0.50980395, 0.50980395, 0, 0.8235294)
+texture = SubResource("GradientTexture2D_dtqjt")
+
+[node name="Hurt Box" type="Area2D" parent="." unique_id=2053083816]
+script = ExtResource("8_wi0c6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurt Box" unique_id=747968746]
+shape = SubResource("CapsuleShape2D_tdg3f")
+
+[node name="Hit Box" type="Area2D" parent="." unique_id=442742283]
+script = ExtResource("8_5ncpa")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hit Box" unique_id=325751958]
+position = Vector2(0, -1.1920929e-07)
+scale = Vector2(1.1599985, 1.039999)
+shape = SubResource("CapsuleShape2D_dtqjt")

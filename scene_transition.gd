@@ -1,5 +1,10 @@
 extends CanvasLayer
 
+## Handles scene transitions with fade effects
+## Manages special behavior for game over vs gameplay scenes
+
+const OVERLAY_LAYER: int = 99
+
 var fade_overlay: ColorRect
 
 func _ready() -> void:
@@ -24,9 +29,10 @@ func _ready() -> void:
 	fade_overlay.grow_vertical = Control.GROW_DIRECTION_BOTH
 	
 	# Set layer below where player will be during reveal
-	layer = 99
+	layer = OVERLAY_LAYER
 
 func transition_to_scene(scene_path: String) -> void:
+	"""Transition to a new scene with fade effect"""
 	print("Starting transition to: ", scene_path)
 	
 	# Ensure overlay is ready
@@ -35,11 +41,11 @@ func transition_to_scene(scene_path: String) -> void:
 		return
 	
 	# Check if this is the game over scene
-	var is_game_over = scene_path.to_lower().contains("gameover")
+	var is_game_over: bool = scene_path.to_lower().contains("gameover")
 	
 	# Fade to black
 	print("Fading to black...")
-	var tween = create_tween()
+	var tween: Tween = create_tween()
 	tween.tween_property(fade_overlay, "modulate:a", 1.0, 0.5)
 	await tween.finished
 	print("Fade to black complete")
@@ -53,7 +59,7 @@ func transition_to_scene(scene_path: String) -> void:
 		# For game over, fade out immediately to show the scene
 		print("Game over scene - fading out black overlay...")
 		if is_inside_tree():
-			var fade_tween = create_tween()
+			var fade_tween: Tween = create_tween()
 			fade_tween.tween_property(fade_overlay, "modulate:a", 0.0, 0.8)
 			await fade_tween.finished
 	else:
@@ -64,7 +70,7 @@ func transition_to_scene(scene_path: String) -> void:
 		# Fade from black to reveal the scene
 		print("Fading from black...")
 		if is_inside_tree():
-			var fade_tween = create_tween()
+			var fade_tween: Tween = create_tween()
 			fade_tween.tween_property(fade_overlay, "modulate:a", 0.0, 0.8)
 	
 	print("Transition complete")

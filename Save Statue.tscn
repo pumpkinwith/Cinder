@@ -1,0 +1,59 @@
+[gd_scene load_steps=9 format=3 uid="uid://dbubh2eqbpuh1"]
+
+[ext_resource type="Texture2D" uid="uid://ci72sunj0w13c" path="res://Sprite/Tile sets/Save Statue -Sheet.png" id="1_bcexw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6yjvn"]
+atlas = ExtResource("1_bcexw")
+region = Rect2(0, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jw7d2"]
+atlas = ExtResource("1_bcexw")
+region = Rect2(16, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dmfkt"]
+atlas = ExtResource("1_bcexw")
+region = Rect2(32, 0, 16, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0tqm3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6yjvn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jw7d2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dmfkt")
+}],
+"loop": true,
+"name": &"Default(Blue)",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bcexw"]
+radius = 4.031129
+
+[sub_resource type="Gradient" id="Gradient_bcexw"]
+offsets = PackedFloat32Array(0.0033333334, 0.79333335)
+colors = PackedColorArray(4.235506e-06, 0.63866866, 0.88868326, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_6yjvn"]
+gradient = SubResource("Gradient_bcexw")
+fill = 1
+fill_from = Vector2(0.49766356, 0.46728972)
+
+[node name="StaticBody2D" type="StaticBody2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_0tqm3")
+animation = &"Default(Blue)"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2.5)
+shape = SubResource("CircleShape2D_bcexw")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(0, -6)
+color = Color(0, 0.24313726, 0.2627451, 0.8156863)
+texture = SubResource("GradientTexture2D_6yjvn")

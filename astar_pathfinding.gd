@@ -1,22 +1,23 @@
 extends Node
 
-# grid based movement pathfinding final final final plz
+## A* pathfinding for isometric tile-based grid
+## Handles 4-directional movement with wall collision detection
 
 class_name AStarPathfinding
 
 var tile_size: Vector2
-var open_set: Array = []
-var closed_set: Array = []
-var came_from: Dictionary = {}
-var g_score: Dictionary = {}
-var f_score: Dictionary = {}
+var open_set: Array[Vector2] = []
+var closed_set: Array[Vector2] = []
+var came_from: Dictionary = {}  # String -> Vector2
+var g_score: Dictionary = {}    # String -> float
+var f_score: Dictionary = {}    # String -> float
 
 func _init(tile_sz: Vector2) -> void:
 	tile_size = tile_sz
 
 # Get walkable neighbors (4 directions)
-func get_neighbors(pos: Vector2) -> Array:
-	var neighbors = []
+func get_neighbors(pos: Vector2) -> Array[Vector2]:
+	var neighbors: Array[Vector2] = []
 	var directions = [
 		Vector2(tile_size.x, tile_size.y),     # SE
 		Vector2(-tile_size.x, -tile_size.y),   # NW

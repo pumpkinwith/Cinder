@@ -1,0 +1,52 @@
+[gd_scene load_steps=7 format=3 uid="uid://bkhxwhcpffikx"]
+
+[ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="1_4nh4k"]
+[ext_resource type="Script" uid="uid://68xb0uaiqfqu" path="res://game_over.gd" id="1_tpdqf"]
+[ext_resource type="Script" uid="uid://bf56yhuj50et4" path="res://quit_label.gd" id="3_eeur3"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_tpdqf"]
+font = ExtResource("1_4nh4k")
+font_size = 116
+
+[sub_resource type="LabelSettings" id="LabelSettings_eeur3"]
+font = ExtResource("1_4nh4k")
+font_size = 48
+font_color = Color(1, 0.84705883, 0.63529414, 1)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4nh4k"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"Retry",
+"speed": 5.0
+}]
+
+[node name="Gameover" type="Node2D"]
+script = ExtResource("1_tpdqf")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="game over" type="Label" parent="CanvasLayer"]
+offset_left = -272.0
+offset_top = -212.0
+offset_right = 287.0
+offset_bottom = -103.0
+text = "Game Over"
+label_settings = SubResource("LabelSettings_tpdqf")
+
+[node name="quit" type="Label" parent="CanvasLayer"]
+offset_left = -99.0
+offset_top = 178.0
+offset_right = 123.0
+offset_bottom = 223.0
+text = "Quit Game"
+label_settings = SubResource("LabelSettings_eeur3")
+script = ExtResource("3_eeur3")
+
+[node name="Retry" type="AnimatedSprite2D" parent="CanvasLayer"]
+position = Vector2(0, 40)
+sprite_frames = SubResource("SpriteFrames_4nh4k")
+animation = &"Retry"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(582, 335)
