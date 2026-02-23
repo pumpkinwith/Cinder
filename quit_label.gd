@@ -8,7 +8,7 @@ const HOVER_COLOR: Color = Color(1.0, 0.588, 0.478, 1.0)  # ff967a peachy/salmon
 const NORMAL_COLOR: Color = Color(1.0, 1.0, 1.0, 1.0)
 const VISIBILITY_THRESHOLD: float = 0.5
 
-@export var fade_in_delay: float = 7  # Wait for BG + Title + Button reveals
+@export var fade_in_delay: float = 7.5  # Wait for Phases 1-3 to complete
 @export var fade_in_duration: float = 0.5
 @export var hit_padding: Vector2 = Vector2(6, 4)
 var is_hovered: bool = false

@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://b182p35kglgev"]
 
-[ext_resource type="Texture2D" uid="uid://cdfle402pnyyo" path="res://Sprite/HUD/Title Screen-Sheet.png" id="1_06t4h"]
-[ext_resource type="Texture2D" uid="uid://btwgjn616mcuq" path="res://Sprite/HUD/menu bar.png" id="1_7vrkn"]
+[ext_resource type="Texture2D" uid="uid://byqnsjm1nxaqa" path="res://Sprite/HUD/Title Screen-Sheet.png" id="1_06t4h"]
 [ext_resource type="Script" uid="uid://buj33obl0whml" path="res://title_screen.gd" id="1_8qtwp"]
-[ext_resource type="Texture2D" uid="uid://c6ftlgdxkvgix" path="res://Sprite/HUD/Title.png" id="1_fu7sn"]
+[ext_resource type="Texture2D" uid="uid://01ps4ctg6pc3" path="res://Sprite/HUD/Title-Sheet.png" id="2_j5v2v"]
 [ext_resource type="Texture2D" uid="uid://cqpnp82xa5n07" path="res://Sprite/HUD/Start button Animation Close-Sheet.png" id="3_glbon"]
 [ext_resource type="Texture2D" uid="uid://btxfg7ajqbrqg" path="res://Sprite/HUD/Start button Animation-Sheet.png" id="4_nlkkf"]
 [ext_resource type="Script" uid="uid://bpgy6iu6p4cdg" path="res://start.gd" id="6_dy7ct"]
 [ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="7_dy7ct"]
 [ext_resource type="Script" uid="uid://bf56yhuj50et4" path="res://quit_label.gd" id="8_0o4t1"]
-[ext_resource type="Script" uid="uid://c5easqxlel7g7" path="res://menu_bar.gd" id="9_0o4t1"]
+[ext_resource type="AudioStream" uid="uid://ntd6pnjufnjo" path="res://Sound/BGM/Main BGM demo.wav" id="11_0k4wn"]
+[ext_resource type="Script" uid="uid://dfjks78td24h8" path="res://bgm.gd" id="12_j5v2v"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cm266"]
 atlas = ExtResource("3_glbon")
@@ -94,48 +94,53 @@ animations = [{
 
 [sub_resource type="LabelSettings" id="LabelSettings_0o4t1"]
 font = ExtResource("7_dy7ct")
-font_size = 96
-font_color = Color(0.6822303, 0.41977477, 7.70092e-07, 1)
+font_size = 112
+font_color = Color(1, 0.85926753, 0.71475893, 1)
 
-[sub_resource type="Gradient" id="Gradient_dy7ct"]
-colors = PackedColorArray(1, 0.62178487, 0.6705559, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_0o4t1"]
-gradient = SubResource("Gradient_dy7ct")
-fill = 1
-fill_from = Vector2(0.48364487, 0.4906542)
-fill_to = Vector2(0.16588785, 0.12616822)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_06t4h"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_g8g3n"]
 atlas = ExtResource("1_06t4h")
-region = Rect2(0, 0, 128, 64)
+region = Rect2(0, 0, 121, 98)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_7vrkn"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_8u0te"]
 atlas = ExtResource("1_06t4h")
-region = Rect2(128, 0, 128, 64)
+region = Rect2(121, 0, 121, 98)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_fu7sn"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_oiatc"]
 atlas = ExtResource("1_06t4h")
-region = Rect2(384, 0, 128, 64)
+region = Rect2(242, 0, 121, 98)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_jix8l"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_mg3m2"]
 atlas = ExtResource("1_06t4h")
-region = Rect2(512, 0, 128, 64)
+region = Rect2(363, 0, 121, 98)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ojb7r"]
+atlas = ExtResource("1_06t4h")
+region = Rect2(484, 0, 121, 98)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e5qqf"]
+atlas = ExtResource("1_06t4h")
+region = Rect2(605, 0, 121, 98)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8qtwp"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_06t4h")
+"texture": SubResource("AtlasTexture_g8g3n")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_7vrkn")
+"texture": SubResource("AtlasTexture_8u0te")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_fu7sn")
+"texture": SubResource("AtlasTexture_oiatc")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_jix8l")
+"texture": SubResource("AtlasTexture_mg3m2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ojb7r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e5qqf")
 }],
 "loop": true,
 "name": &"Main",
@@ -162,14 +167,14 @@ script = ExtResource("1_8qtwp")
 
 [node name="Title" type="Sprite2D" parent="." unique_id=1291105836]
 z_index = 2
-position = Vector2(-732.00006, -764.00006)
-scale = Vector2(12.765623, 12.765623)
-texture = ExtResource("1_fu7sn")
+position = Vector2(-1047, -803)
+scale = Vector2(9.693162, 9.693161)
+texture = ExtResource("2_j5v2v")
 
 [node name="Start" type="AnimatedSprite2D" parent="." unique_id=427943794]
 z_index = 2
-position = Vector2(-1133, -113.00001)
-scale = Vector2(13.879769, 13.879769)
+position = Vector2(-1533.0394, -105.16012)
+scale = Vector2(12.960464, 12.960464)
 sprite_frames = SubResource("SpriteFrames_cm266")
 animation = &"Start_Open"
 autoplay = "Start"
@@ -179,33 +184,21 @@ script = ExtResource("6_dy7ct")
 [node name="Quit game" type="Label" parent="." unique_id=1325474264]
 z_index = 2
 layout_mode = 0
-offset_left = -973.0
-offset_top = 455.0
-offset_right = -524.06665
-offset_bottom = 546.0
+offset_left = -1469.0
+offset_top = 469.0
+offset_right = -951.0
+offset_bottom = 574.0
 text = "Quit Game"
 label_settings = SubResource("LabelSettings_0o4t1")
 script = ExtResource("8_0o4t1")
 
-[node name="Menu Bar" type="Sprite2D" parent="." unique_id=1306534460]
-z_index = 1
-position = Vector2(-754.5, -1)
-scale = Vector2(22.625004, 33.468754)
-texture = ExtResource("1_7vrkn")
-script = ExtResource("9_0o4t1")
-
-[node name="PointLight2D" type="PointLight2D" parent="Menu Bar" unique_id=1402485815]
-position = Vector2(-16.045406, 0.4015056)
-scale = Vector2(0.82781446, 1)
-texture = SubResource("GradientTexture2D_0o4t1")
-
 [node name="BG" type="AnimatedSprite2D" parent="." unique_id=23165818]
-position = Vector2(6.0000005, -0.9999995)
-scale = Vector2(23.321438, 24.388428)
+position = Vector2(731.00006, 29.000015)
+scale = Vector2(18.121626, 19.382822)
 sprite_frames = SubResource("SpriteFrames_8qtwp")
 animation = &"Main"
 autoplay = "Main"
-frame_progress = 0.019383669
+frame_progress = 0.027821213
 
 [node name="PointLight2D" type="PointLight2D" parent="BG" unique_id=1303101161]
 z_index = 1
@@ -215,6 +208,7 @@ texture = SubResource("GradientTexture2D_qe12f")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=662532595]
 position = Vector2(-9, -133)
+zoom = Vector2(0.9, 0.9)
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="." unique_id=743125267]
 energy = 0.5
@@ -223,8 +217,22 @@ blend_mode = 1
 [node name="BG2" type="ColorRect" parent="." unique_id=1875163982]
 z_index = -100
 layout_mode = 0
-offset_left = -5535.0
-offset_top = -6253.0
-offset_right = 9038.0
-offset_bottom = 8320.0
-color = Color(0.02745098, 0.023529412, 0.050980393, 1)
+offset_left = -5969.0
+offset_top = -5587.0
+offset_right = 8604.0
+offset_bottom = 8986.0
+color = Color(0.050980393, 0.03137255, 0.0627451, 1)
+
+[node name="BGM" type="AudioStreamPlayer2D" parent="." unique_id=137448292]
+stream = ExtResource("11_0k4wn")
+volume_db = -5.0
+script = ExtResource("12_j5v2v")
+
+[node name="Bar" type="ColorRect" parent="." unique_id=1987563638]
+z_index = 1
+layout_mode = 0
+offset_left = -2142.0
+offset_top = -1613.0
+offset_right = -462.0
+offset_bottom = 1401.0
+color = Color(0.5019608, 0, 0.2, 0.32156864)

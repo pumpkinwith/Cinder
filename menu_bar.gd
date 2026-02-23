@@ -1,8 +1,6 @@
 extends Sprite2D
 
-## Menu bar sprite
-## Always visible, no animation
+## Menu bar sprite — starts hidden, faded in by title_screen.gd Phase 2
 
 func _ready() -> void:
-	# Start fully visible
-	modulate.a = 1.0
+	modulate.a = 0.0

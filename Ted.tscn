@@ -334,25 +334,20 @@ radius = 3.0
 height = 6.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_u4pro"]
-radius = 12.0
-height = 24.0
+radius = 11.0
+height = 22.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hwtqp"]
 radius = 4.0
 height = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3l6u8"]
-radius = 82.38932
+radius = 85.0
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=547681924]
 collision_layer = 2
 script = ExtResource("1_evxai")
 move_speed = 30.0
-health = null
-max_health = null
-attack_damage = null
-attack_interval = null
-elevation = null
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1973795415]
 z_index = 2
@@ -382,7 +377,7 @@ position = Vector2(0, 1)
 shape = SubResource("CapsuleShape2D_hwtqp")
 
 [node name="Detection Range" type="Area2D" parent="." unique_id=1588034424]
-collision_mask = 2
+collision_mask = 4
 script = ExtResource("9_p0hfd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Detection Range" unique_id=1065483260]

@@ -2,7 +2,9 @@
 
 [ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="1_4nh4k"]
 [ext_resource type="Script" uid="uid://68xb0uaiqfqu" path="res://game_over.gd" id="1_tpdqf"]
-[ext_resource type="Script" uid="uid://bf56yhuj50et4" path="res://quit_label.gd" id="3_eeur3"]
+[ext_resource type="Script" uid="uid://dh0pfoewhvgcd" path="res://quit_game.gd" id="3_eeur3"]
+[ext_resource type="Script" uid="uid://bv2f7oa4t1q3b" path="res://resume.gd" id="4_resume"]
+[ext_resource type="Texture2D" uid="uid://k76h4j17gwv3" path="res://Sprite/HUD/Resume-Sheet.png" id="5_resume_tex"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_tpdqf"]
 font = ExtResource("1_4nh4k")
@@ -12,14 +14,6 @@ font_size = 116
 font = ExtResource("1_4nh4k")
 font_size = 48
 font_color = Color(1, 0.84705883, 0.63529414, 1)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_4nh4k"]
-animations = [{
-"frames": [],
-"loop": true,
-"name": &"Retry",
-"speed": 5.0
-}]
 
 [node name="Gameover" type="Node2D"]
 script = ExtResource("1_tpdqf")
@@ -43,10 +37,13 @@ text = "Quit Game"
 label_settings = SubResource("LabelSettings_eeur3")
 script = ExtResource("3_eeur3")
 
-[node name="Retry" type="AnimatedSprite2D" parent="CanvasLayer"]
-position = Vector2(0, 40)
-sprite_frames = SubResource("SpriteFrames_4nh4k")
-animation = &"Retry"
+[node name="Retry" type="TextureButton" parent="CanvasLayer"]
+offset_left = -27.0
+offset_top = 20.0
+offset_right = 27.0
+offset_bottom = 36.0
+texture_normal = ExtResource("5_resume_tex")
+script = ExtResource("4_resume")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(582, 335)

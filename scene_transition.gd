@@ -33,7 +33,6 @@ func _ready() -> void:
 
 func transition_to_scene(scene_path: String) -> void:
 	"""Transition to a new scene with fade effect"""
-	print("Starting transition to: ", scene_path)
 	
 	# Ensure overlay is ready
 	if not fade_overlay:
@@ -44,11 +43,9 @@ func transition_to_scene(scene_path: String) -> void:
 	var is_game_over: bool = scene_path.to_lower().contains("gameover")
 	
 	# Fade to black
-	print("Fading to black...")
 	var tween: Tween = create_tween()
 	tween.tween_property(fade_overlay, "modulate:a", 1.0, 0.5)
 	await tween.finished
-	print("Fade to black complete")
 	
 	# Change scene
 	get_tree().change_scene_to_file(scene_path)
@@ -57,20 +54,15 @@ func transition_to_scene(scene_path: String) -> void:
 	
 	if is_game_over:
 		# For game over, fade out immediately to show the scene
-		print("Game over scene - fading out black overlay...")
 		if is_inside_tree():
 			var fade_tween: Tween = create_tween()
 			fade_tween.tween_property(fade_overlay, "modulate:a", 0.0, 0.8)
 			await fade_tween.finished
 	else:
 		# Stay black and wait for player fire reveal to complete (3.5 seconds + buffer)
-		print("Waiting for player fire reveal...")
 		await get_tree().create_timer(3.7).timeout
 		
 		# Fade from black to reveal the scene
-		print("Fading from black...")
 		if is_inside_tree():
 			var fade_tween: Tween = create_tween()
 			fade_tween.tween_property(fade_overlay, "modulate:a", 0.0, 0.8)
-	
-	print("Transition complete")

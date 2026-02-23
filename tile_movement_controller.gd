@@ -14,6 +14,7 @@ const TILE_SIZE: Vector2 = Vector2(8, 4)  # Isometric tile dimensions
 @export var occupy_check_radius: float = 1.5
 @export var use_free_movement: bool = true  # Allow free movement instead of strict tile-based
 @export var elevation: float = 0.0  # Y-offset for vertical positioning (for future terrain)
+@export var movement_tilemap_path: NodePath = NodePath("../Terrain 0")
 
 var is_moving: bool = false
 var target_pos: Vector2 = Vector2.ZERO
@@ -24,12 +25,24 @@ var _travel_t: float = 0.0
 var _travel_time: float = 0.0
 var _stuck_timer: float = 0.0
 var _last_valid_pos: Vector2 = Vector2.ZERO
+var movement_tilemap: TileMapLayer = null
+var tile_step: Vector2 = TILE_SIZE
 
 # Shared reservation map so only one entity can reserve a tile at a time
 # CRITICAL: Must be static to be shared across all instances
 static var _reserved_tiles: Dictionary = {}
 
 func _ready() -> void:
+	if movement_tilemap_path != NodePath():
+		movement_tilemap = get_node_or_null(movement_tilemap_path)
+	if not movement_tilemap:
+		var parent = get_parent()
+		if parent:
+			movement_tilemap = parent.get_node_or_null("Terrain 0")
+	if movement_tilemap and movement_tilemap.tile_set:
+		var ts = movement_tilemap.tile_set.tile_size
+		tile_step = Vector2(ts.x * 0.5, ts.y * 0.5)
+
 	# Ensure entity starts exactly on a tile center
 	target_pos = world_to_tile(global_position)
 	global_position = target_pos
@@ -219,10 +232,10 @@ func stop_movement() -> void:
 func move_by_direction(dir: String) -> bool:
 	var offset := Vector2.ZERO
 	match dir:
-		"SE": offset = Vector2(TILE_SIZE.x, TILE_SIZE.y)
-		"NW": offset = Vector2(-TILE_SIZE.x, -TILE_SIZE.y)
-		"SW": offset = Vector2(-TILE_SIZE.x, TILE_SIZE.y)
-		"NE": offset = Vector2(TILE_SIZE.x, -TILE_SIZE.y)
+		"SE": offset = Vector2(tile_step.x, tile_step.y)
+		"NW": offset = Vector2(-tile_step.x, -tile_step.y)
+		"SW": offset = Vector2(-tile_step.x, tile_step.y)
+		"NE": offset = Vector2(tile_step.x, -tile_step.y)
 		_:
 			return false
 	return move_to(global_position + offset)
@@ -239,7 +252,7 @@ func apply_knockback_vector(kb_vector: Vector2, strength_tiles: float = 1.0) -> 
 	stop_movement()
 	
 	# Compute desired world position
-	var kb_distance = Vector2(TILE_SIZE.x, TILE_SIZE.y).length() * strength_tiles
+	var kb_distance = tile_step.length() * strength_tiles
 	var desired = global_position + kb_vector.normalized() * kb_distance
 	
 	if use_free_movement:
@@ -298,16 +311,19 @@ func apply_knockback_vector(kb_vector: Vector2, strength_tiles: float = 1.0) -> 
 	is_moving = true
 
 ## Get the tile position for a world position
-static func world_to_tile(world_pos: Vector2) -> Vector2:
-	return (world_pos / TILE_SIZE).round() * TILE_SIZE
+func world_to_tile(world_pos: Vector2) -> Vector2:
+	if movement_tilemap:
+		var coords: Vector2i = movement_tilemap.local_to_map(movement_tilemap.to_local(world_pos))
+		return movement_tilemap.to_global(movement_tilemap.map_to_local(coords))
+	return (world_pos / tile_step).round() * tile_step
 
 ## Get adjacent tile positions (4 cardinal directions in isometric)
 func get_adjacent_tiles() -> Array[Vector2]:
 	var tiles: Array[Vector2] = []
-	tiles.append(global_position + Vector2(TILE_SIZE.x, TILE_SIZE.y))    # SE
-	tiles.append(global_position + Vector2(-TILE_SIZE.x, -TILE_SIZE.y))  # NW
-	tiles.append(global_position + Vector2(-TILE_SIZE.x, TILE_SIZE.y))   # SW
-	tiles.append(global_position + Vector2(TILE_SIZE.x, -TILE_SIZE.y))   # NE
+	tiles.append(global_position + Vector2(tile_step.x, tile_step.y))    # SE
+	tiles.append(global_position + Vector2(-tile_step.x, -tile_step.y))  # NW
+	tiles.append(global_position + Vector2(-tile_step.x, tile_step.y))   # SW
+	tiles.append(global_position + Vector2(tile_step.x, -tile_step.y))   # NE
 	return tiles
 
 ## Get direction vector from current position to target

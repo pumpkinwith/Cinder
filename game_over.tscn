@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://cq14dr1xsodr6"]
+
+[ext_resource type="FontFile" uid="uid://iimijw1hdlko" path="res://Sprite/Fonts/alagard.ttf" id="1_y26ei"]
+[ext_resource type="Script" uid="uid://1njldr0b2ve" path="res://game_over.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://b5ojxwsyypq5l" path="res://Sprite/HUD/Resume (idk language)-Sheet.png" id="3_8u835"]
+[ext_resource type="Script" uid="uid://dh0pfoewhvgcd" path="res://quit_game.gd" id="3_28vn7"]
+[ext_resource type="Texture2D" uid="uid://k76h4j17gwv3" path="res://Sprite/HUD/Resume-Sheet.png" id="4_ftari"]
+[ext_resource type="Script" uid="uid://bv2f7oa4t1q3b" path="res://resume.gd" id="6_k2vha"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_28vn7"]
+font = ExtResource("1_y26ei")
+font_size = 48
+font_color = Color(1, 0.85926753, 0.71475893, 1)
+
+[node name="Game Over" type="Control" unique_id=617421120]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+
+[node name="Quit game" type="Label" parent="." unique_id=1717777974]
+z_index = 2
+layout_mode = 0
+offset_left = 494.0
+offset_top = 580.0
+offset_right = 716.0
+offset_bottom = 625.0
+text = "Quit Game"
+label_settings = SubResource("LabelSettings_28vn7")
+script = ExtResource("3_28vn7")
+
+[node name="text" type="Label" parent="." unique_id=1379814698]
+z_index = 1
+layout_mode = 0
+offset_left = 395.0
+offset_top = 120.0
+offset_right = 780.0
+offset_bottom = 195.0
+theme_override_fonts/font = ExtResource("1_y26ei")
+theme_override_font_sizes/font_size = 80
+text = "Game Over"
+
+[node name="Bg" type="ColorRect" parent="." unique_id=2095542850]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0150001
+anchor_bottom = 1.0400001
+offset_left = -374.0
+offset_top = -288.0
+offset_right = -0.28015137
+offset_bottom = 0.079956055
+color = Color(0, 0, 0, 1)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1359744094]
+position = Vector2(587, 333)
+zoom = Vector2(2, 2)
+
+[node name="Resume" type="TextureButton" parent="." unique_id=929100558]
+layout_mode = 0
+offset_left = 447.0
+offset_top = 379.00003
+offset_right = 501.00003
+offset_bottom = 395.00003
+scale = Vector2(5.811824, 5.811824)
+texture_normal = ExtResource("3_8u835")
+texture_hover = ExtResource("4_ftari")
+script = ExtResource("6_k2vha")
